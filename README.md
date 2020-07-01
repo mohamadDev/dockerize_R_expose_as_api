@@ -50,4 +50,41 @@ function(msg = "") {
 ```
 
 if you want to have post method use (#* @post instead of get)
-to read more about how to declare api in plumber 
+to read more click  [https://www.rplumber.io/][HERE] 
+
+
+## step 5 
+now everything should be fine, you can dockerise your code and ship it anywhere you want 
+
+```sh
+$ touch Dockerfile
+```
+append following lines
+
+```sh
+FROM trestletech/plumber
+
+#to install packages uncoment following line
+#RUN R -e "install.packages('whatever it is used in the code')"
+
+
+#for apt-get uncomment & modify following line 
+#RUN apt-get update -qq && apt-get install whatever is needed 
+
+#expose a port 
+EXPOSE 8000
+
+#make a folder and copy your files 
+RUN mkdir /app
+COPY funcs.R /app
+COPY plumber.R /app
+WORKDIR /app
+
+#set entrypoint
+ENTRYPOINT ["R", "-e", "pr <- plumber::plumb('plumber.R'); pr$run(host='0.0.0.0', port=8000,swagger=TRUE)"]
+```
+
+build your docker and forward port 8000 from your container to any port you want on host 
+
+
+
